@@ -464,4 +464,23 @@ JOIN pago p ON p.codigo_cliente = c.codigo_cliente
 GROUP BY nombre;
 
 /* 12 Calcula el número de productos diferentes que hay en cada uno de los
-pedidos.
+pedidos. */
+
+SELECT pe.codigo_pedido, COUNT(d.codigo_pedido)
+FROM producto p
+JOIN detalle_pedido d ON d.codigo_producto = p.codigo_producto
+JOIN pedido pe ON pe.codigo_pedido = d.codigo_pedido
+GROUP BY pe.codigo_pedido;
+
+/* 13 Calcula la suma de la cantidad total de todos los productos que aparecen en
+cada uno de los pedidos.
+*/
+SELECT p.nombre, SUM(d.cantidad)
+FROM producto p
+JOIN detalle_pedido d ON d.codigo_producto = p.codigo_producto
+JOIN pedido pe ON pe.codigo_pedido = d.codigo_pedido
+GROUP BY p.nombre;
+
+/* 14. Devuelve un listado de los 20 productos más vendidos y el número total de
+unidades que se han vendido de cada uno. El listado deberá estar ordenado
+por el número total de unidades vendidas. */
