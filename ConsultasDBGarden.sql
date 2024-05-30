@@ -1,4 +1,4 @@
--- Active: 1717012450849@@127.0.0.1@3306@dbgarden
+-- Active: 1717105247149@@127.0.0.1@3306@dbGarden
 use dbgarden;
 
 --1. Devuelve un listado con el código de oficina y la ciudad donde hay oficinas.
@@ -366,3 +366,102 @@ WHERE pr.gama = "Frutales");
 /* 11. . Devuelve un listado con los clientes que han realizado algún pedido pero no
 han realizado ningún pago */
 
+SELECT c.nombre_cliente
+FROM cliente c
+LEFT JOIN pago p ON p.codigo_cliente = c.codigo_cliente
+JOIN pedido pe ON pe.codigo_cliente = c.codigo_cliente
+WHERE p.id_transaccion is NULL;
+
+/* 12. Devuelve un listado con los datos de los empleados que no tienen clientes
+asociados y el nombre de su jefe asociado. */
+
+SELECT CONCAT(e.nombre," ", e.apellido1), j.nombre
+FROM empleado e
+LEFT JOIN cliente c ON c.codigo_empleado_rep_ventas = codigo_empleado
+JOIN empleado j ON e.codigo_jefe = j.codigo_empleado
+WHERE c.codigo_empleado_rep_ventas IS NULL;
+
+-- ////////// CONSULTA RESUMEN \\\\\\\\\\\\\ 
+
+-- 1. ¿Cuántos empleados hay en la compañía?
+SELECT COUNT(*)
+FROM empleado;
+
+-- 2. ¿Cuántos clientes tiene cada país?
+
+SELECT p.nombre_pais, COUNT(cl.codigo_cliente)
+FROM pais p
+JOIN region r ON r.codigo_pais = p.codigo_pais
+JOIN ciudad c ON c.codigo_region = r.codigo_region
+JOIN codigo_postal cp ON cp.codigo_ciudad = c.codigo_ciudad
+JOIN cliente cl ON cl.codigo_postal = cp.cod_postal
+GROUP BY p.nombre_pais;
+
+-- 3. ¿Cuál fue el pago medio en 2009?
+
+SELECT AVG(p.total)
+FROM pago p
+WHERE YEAR(p.fecha_pago) = '2009';
+
+/* 4. ¿Cuántos pedidos hay en cada estado? Ordena el resultado de forma
+descendente por el número de pedidos. */
+
+SELECT e.descripcion_estado, COUNT(p.codigo_estado)
+FROM estado_pedido e
+LEFT JOIN pedido p ON p.codigo_estado = e.codigo_estado
+GROUP BY e.descripcion_estado;
+
+/* 5 Calcula el precio de venta del producto más caro y más barato en una
+misma consulta */
+
+SELECT MAX(p.precio_venta) as "Producto mas caro", MIN(p.precio_venta) as "Producto mas barato"
+FROM producto p;
+
+/* 6 Calcula el número de clientes que tiene la empresa */
+
+SELECT COUNT(c.codigo_cliente)
+FROM cliente c;
+
+/* 7. ¿Cuántos clientes existen con domicilio en la ciudad de Madrid? */
+
+SELECT COUNT(c.codigo_cliente)
+FROM cliente c
+JOIN codigo_postal cp ON cp.cod_postal = c.codigo_postal
+JOIN ciudad ci ON ci.codigo_ciudad = cp.codigo_ciudad
+WHERE ci.nombre_ciudad = "Madrid";
+
+/* 8. ¿Calcula cuántos clientes tiene cada una de las ciudades que empiezan
+por M? */
+
+SELECT  ci.nombre_ciudad, COUNT(c.codigo_cliente)
+FROM ciudad ci
+JOIN codigo_postal cp ON ci.codigo_ciudad = cp.codigo_ciudad
+LEFT JOIN cliente c ON cp.cod_postal = c.codigo_postal
+WHERE ci.nombre_ciudad LIKE 'M%'
+GROUP BY ci.nombre_ciudad;
+
+/* 9. Devuelve el nombre de los representantes de ventas y el número de clientes
+al que atiende cada uno. */ 
+
+SELECT e.nombre, COUNT(c.codigo_cliente)
+FROM empleado e
+JOIN cliente c ON c.codigo_empleado_rep_ventas = e.codigo_empleado
+GROUP BY e.nombre;
+
+/*10.  Calcula el número de clientes que no tiene asignado representante de
+ventas. */
+
+SELECT COUNT(c.codigo_cliente)
+FROM cliente c
+WHERE c.codigo_empleado_rep_ventas IS NULL;
+
+/*11  Calcula la fecha del primer y último pago realizado por cada uno de los
+clientes. El listado deberá mostrar el nombre y los apellidos de cada cliente. */
+
+SELECT CONCAT(c.nombre_cliente, c.apellido_contacto) as nombre, MAX(p.fecha_pago), MIN(p.fecha_pago)
+FROM cliente c
+JOIN pago p ON p.codigo_cliente = c.codigo_cliente
+GROUP BY nombre;
+
+/* 12 Calcula el número de productos diferentes que hay en cada uno de los
+pedidos.
