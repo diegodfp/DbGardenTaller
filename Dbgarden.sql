@@ -1,4 +1,4 @@
--- Active: 1717012450849@@127.0.0.1@3306@dbgarden
+-- Active: 1717105247149@@127.0.0.1@3306@dbGarden
 /* CREACION Y USO BASE DE DATOS */
 
 DROP DATABASE IF EXISTS dbGarden;
@@ -448,7 +448,7 @@ VALUES
 
 -- INSERTAR CLIENTE CON EL MAYOR CREDITO PARA CONFIRMAR SUBCONSULTA:
 INSERT INTO cliente VALUES
-(14,"CLIENTE SINLIMITE", "Ricky", "Ricon","777-7777","In the heaven 55","In paradise",28936,1,999999999);
+(15,"CLIENTE SINLIMITE", "Ricky", "Ricon","777-7777","In the heaven 55","In paradise",28936,1,999999999);
 
 -- insertar cliente que ha hecho dos pagos
 INSERT INTO pago VALUES

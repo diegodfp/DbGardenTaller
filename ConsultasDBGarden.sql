@@ -1,4 +1,4 @@
--- Active: 1717012450849@@127.0.0.1@3306@dbgarden
+-- Active: 1717105247149@@127.0.0.1@3306@dbGarden
 use dbgarden;
 
 --1. Devuelve un listado con el código de oficina y la ciudad donde hay oficinas.
@@ -17,7 +17,7 @@ JOIN codigo_postal cp ON cp.cod_postal = o.codigo_postal
 JOIN ciudad c ON c.codigo_ciudad = cp.codigo_ciudad
 JOIN region r ON r.codigo_region = c.codigo_region
 JOIN pais p ON p.codigo_pais = r.codigo_pais
-WHERE P.nombre_pais = "España";
+WHERE p.nombre_pais = "España";
 
 
 /* 3. Devuelve un listado con el nombre, apellidos y email de los empleados cuyo
@@ -157,10 +157,12 @@ FROM forma_pago fp;
  -- 16. Devuelve un listado con todos los clientes que sean de la ciudad de Madrid y cuyo representante de ventas tenga 
  -- el código de empleado 11 o 30.
 
-select * 
-from cliente as C
-where C.ciudad = "Madrid" and C.codigo_empleado_rep_ventas = 11 or C.codigo_empleado_rep_ventas = 30 ;
-
+SELECT *
+FROM cliente c
+JOIN codigo_postal cp ON cp.cod_postal = c.codigo_postal
+JOIN ciudad ci ON cp.codigo_ciudad = ci.codigo_ciudad
+JOIN empleado e ON e.codigo_empleado = c.codigo_empleado_rep_ventas
+WHERE ci.nombre_ciudad = "Madrid" AND e.codigo_empleado = 11 OR e.codigo_empleado =30;
 
   --  //////////// Consultas multitabla (Composición interna)  \\\\\\\\\\\\\\\\
 
