@@ -1,4 +1,4 @@
--- Active: 1717105247149@@127.0.0.1@3306@dbGarden
+-- Active: 1717012450849@@127.0.0.1@3306@dbgarden
 /* CREACION Y USO BASE DE DATOS */
 
 DROP DATABASE IF EXISTS dbGarden;
@@ -432,3 +432,24 @@ INSERT INTO pago VALUES
 (11, 'TXN0001', '2009-01-15', 1500.00, 1),
 (12, 'TXN0002', '2009-03-22', 2500.00, 1),
 (13, 'TXN0003', '2009-05-18', 1750.00, 3);
+
+-- INSERTAR REGISTRO PARA LA CONSULTA 17 DE CONSULTAS RESUMEN, CODIGO DE PRODUCTO QUE EMPICE CON "OR"
+INSERT INTO producto
+VALUES ('OR001', 'Orquídea Blanca', 'Ornamentales', '35 cm', 'Hermosa orquídea blanca para decoración', 50, 30.00, 18.00, 1);
+
+INSERT INTO detalle_pedido
+VALUES
+(1, 'OR001', 10, 30.00, 1),
+(2, 'OR001', 5, 30.00, 1),
+(3, 'OR001', 20, 30.00, 1),
+(4, 'OR001', 100, 30.00, 1),
+(5, 'OR001', 50, 30.00, 1),
+(6, 'OR001', 200, 30.00, 1);
+
+-- INSERTAR CLIENTE CON EL MAYOR CREDITO PARA CONFIRMAR SUBCONSULTA:
+INSERT INTO cliente VALUES
+(14,"CLIENTE SINLIMITE", "Ricky", "Ricon","777-7777","In the heaven 55","In paradise",28936,1,999999999);
+
+-- insertar cliente que ha hecho dos pagos
+INSERT INTO pago VALUES
+(1,'TXN0012','2024-01-01',5000.00,1);
