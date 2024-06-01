@@ -1092,6 +1092,11 @@ SELECT dp.codigo_producto,
 FROM detalle_pedido dp
 WHERE dp.codigo_producto LIKE 'OR%'
 GROUP BY dp.codigo_producto;
++-----------------+----------------+-----------+-----------------+
+| codigo_producto | base_imponible | IVA       | total_facturado |
++-----------------+----------------+-----------+-----------------+
+| OR001           |       11550.00 | 2425.5000 |      13975.5000 |
++-----------------+----------------+-----------+-----------------+
 ```
 ##### 18. Lista las ventas totales de los productos que hayan facturado más de 3000 euros. Se mostrará el nombre, unidades vendidas, total facturado y total facturado con impuestos (21% IVA).
 ```
@@ -1102,12 +1107,24 @@ FROM producto p
 JOIN detalle_pedido  dp ON dp.codigo_producto = p.codigo_producto
 GROUP BY p.nombre
 HAVING total_facturado > 3000;
++-----------------+------------------+----------------+-----------------+
+| nombre          | SUM(dp.cantidad) | base_imponible | total_facturado |
++-----------------+------------------+----------------+-----------------+
+| Orquídea Blanca |              385 |       11550.00 |      13975.5000 |
++-----------------+------------------+----------------+-----------------+
 ```
 ##### 19. Muestre la suma total de todos los pagos que se realizaron para cada uno de los años que aparecen en la tabla pagos. 
 ```
 SELECT YEAR(p.fecha_pago), SUM(p.total)
 FROM pago p
 GROUP BY YEAR(p.fecha_pago);
++--------------------+--------------+
+| YEAR(p.fecha_pago) | SUM(p.total) |
++--------------------+--------------+
+|               2008 |      7800.00 |
+|               2024 |      5000.00 |
+|               2023 |     16300.00 |
++--------------------+--------------+
 ```
 ###  SUBCONSULTAS 
 
