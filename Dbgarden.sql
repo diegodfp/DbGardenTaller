@@ -1,4 +1,4 @@
--- Active: 1717105247149@@127.0.0.1@3306@dbGarden
+-- Active: 1717012450849@@127.0.0.1@3306@dbgarden
 /* CREACION Y USO BASE DE DATOS */
 
 DROP DATABASE IF EXISTS dbGarden;
@@ -453,3 +453,22 @@ INSERT INTO cliente VALUES
 -- insertar cliente que ha hecho dos pagos
 INSERT INTO pago VALUES
 (1,'TXN0012','2024-01-01',5000.00,1);
+
+-- insertar datos para que consulta 16 arroje resultados
+INSERT INTO empleado (codigo_empleado, nombre, apellido1, apellido2, extension, email, codigo_oficina, codigo_jefe, codigo_cargo) VALUES
+(11, 'Miguel', 'Torres', 'Navarro', '1011', 'miguel.torres@empresa.com', 'OF007', 7, 5),
+(30, 'Alberto', 'Soria', NULL, '1030', 'alberto.soria@empresa.com', 'OF007', 7, 5);
+INSERT INTO cliente  VALUES
+(16, 'Cliente DIECI', 'Carlos', 'Blanco', '321-4567', 'Calle 11 # 11-11', 'Oficina 111', '28001', 11, 50000.00),
+(17, 'Cliente SEIS', 'Maria', 'Perez', '432-5678', 'Calle 12 # 12-12', 'Oficina 112', '28001', 30, 75000.00);
+
+-- inserta datos para cliente que no paga pero si pide
+INSERT INTO pedido  VALUES
+(13, '2023-03-01', '2023-03-10', '2023-03-09', 'Entrega puntual', 11, 1);
+
+-- insert para pedidos del 2008
+INSERT INTO pedido VALUES
+(15, '2008-05-01', '2023-05-10', '2023-05-09', 'Entrega inpuntual', 1, 1),
+(16, '2008-05-01', '2023-05-10', '2023-05-09', 'Entrega inpuntual', 3, 1),
+(17, '2008-05-01', '2023-05-10', '2023-05-09', 'Entrega inpuntual', 4, 1),
+(18, '2008-05-01', '2023-05-10', '2023-05-09', 'Entrega inpuntual', 8, 1);

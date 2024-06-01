@@ -333,13 +333,18 @@ FROM forma_pago fp;
  ##### 16. Devuelve un listado con todos los clientes que sean de la ciudad de Madrid y cuyo representante de ventas tenga  el código de empleado 11 o 30.
 
 ```
-SELECT *
+SELECT c.nombre_cliente
 FROM cliente c
 JOIN codigo_postal cp ON cp.cod_postal = c.codigo_postal
 JOIN ciudad ci ON cp.codigo_ciudad = ci.codigo_ciudad
 JOIN empleado e ON e.codigo_empleado = c.codigo_empleado_rep_ventas
 WHERE ci.nombre_ciudad = "Madrid" AND e.codigo_empleado = 11 OR e.codigo_empleado =30;
-Empty set (0,00 sec)
++----------------+
+| nombre_cliente |
++----------------+
+| Cliente DIECI  |
+| Cliente SEIS   |
++----------------+
 
 ```
 
@@ -641,7 +646,15 @@ FROM cliente c
 LEFT JOIN pedido p ON c.codigo_cliente = p.codigo_cliente
 LEFT JOIN pago pa ON pa.codigo_cliente = c.codigo_cliente
 WHERE p.codigo_pedido IS NULL and pa.id_transaccion IS NULL; 
-Empty set (0,00 sec)
++------------------------+
+| nombre_cliente         |
++------------------------+
+| Cliente MOROSO         |
+| Cliente de FUENLABRADA |
+| CLIENTE SINLIMITE      |
+| Cliente DIECI          |
+| Cliente SEIS           |
++------------------------+
 
 ```
 
@@ -1096,29 +1109,38 @@ SELECT YEAR(p.fecha_pago), SUM(p.total)
 FROM pago p
 GROUP BY YEAR(p.fecha_pago);
 ```
--- /////// SUBCONSULTAS \\\\\\\\\\\\
+###  SUBCONSULTAS 
 
--- 1. Devuelve el nombre del cliente con mayor límite de crédito.
-
+##### 1. Devuelve el nombre del cliente con mayor límite de crédito.
+```
 SELECT c.nombre_cliente
 FROM cliente c
 WHERE c.limite_credito = (
   SELECT MAX(c.limite_credito)
   FROM cliente c
   );
--- 2. Devuelve el nombre del producto que tenga el precio de venta más caro.
-
++-------------------+
+| nombre_cliente    |
++-------------------+
+| CLIENTE SINLIMITE |
++-------------------+
+```
+##### 2. Devuelve el nombre del producto que tenga el precio de venta más caro.
+```
 SELECT p.nombre
 FROM producto p
 WHERE p.precio_venta = (
   SELECT MAX(p.precio_venta)
   FROM producto p
   );
-
-/* Devuelve el nombre del producto del que se han vendido más unidades.
-(Tenga en cuenta que tendrá que calcular cuál es el número total de
-unidades que se han vendido de cada producto a partir de los datos de la
-tabla detalle_pedido */
++--------------+
+| nombre       |
++--------------+
+| Bonsái Ficus |
++--------------+
+```
+##### 3. Devuelve el nombre del producto del que se han vendido más unidades.(Tenga en cuenta que tendrá que calcular cuál es el número total deunidades que se han vendide los datos de o de cada producto a partir de la abla detalle_pedido )
+```
 SELECT p.nombre
 FROM producto p
 WHERE p.codigo_producto = (
@@ -1128,10 +1150,14 @@ WHERE p.codigo_producto = (
   ORDER BY  SUM(dp.cantidad)  DESC
   LIMIT 1
 );
-
-/* 4. Los clientes cuyo límite de crédito sea mayor que los pagos que haya
-realizado. (Sin utilizar INNER JOIN). */
-
++-----------------+
+| nombre          |
++-----------------+
+| Orquídea Blanca |
++-----------------+
+```
+##### 4. Los clientes cuyo límite de crédito sea mayor que los pagos que haya  realizado. (Sin utilizar INNER JOIN). 
+```
 SELECT c.nombre_cliente
 FROM cliente c
 WHERE c.limite_credito > (
@@ -1147,8 +1173,29 @@ WHERE c.limite_credito > (
     FROM pago p
     WHERE c.codigo_cliente = p.codigo_cliente
 );
-
-/* 5. . Devuelve el producto que más unidades tiene en stock. */
++------------------------+
+| nombre_cliente         |
++------------------------+
+| Cliente A              |
+| Cliente B              |
+| Cliente C              |
+| Cliente D              |
+| Cliente E              |
+| Cliente F              |
+| Cliente G              |
+| Cliente H              |
+| Cliente I              |
+| Cliente J              |
+| Cliente MOROSO         |
+| Cliente de FUENLABRADA |
+| Cliente que            |
+| CLIENTE SINLIMITE      |
+| Cliente DIECI          |
+| Cliente SEIS           |
++------------------------+
+```
+##### 5 . Devuelve el producto que más unidades tiene en stock. 
+```
 SELECT p.nombre
 FROM producto p
 WHERE p.cantidad_en_stock = (
@@ -1156,19 +1203,28 @@ WHERE p.cantidad_en_stock = (
   FROM producto dp
   
 );
-
-/* 6.6. Devuelve el producto que menos unidades tiene en stock.
-*/
++--------+
+| nombre |
++--------+
+| Menta  |
++--------+
+```
+##### 6. Devuelve el producto que menos unidades tiene en stock.
+```
 SELECT p.nombre
 FROM producto p
 WHERE p.cantidad_en_stock = (
   SELECT MIN(dp.cantidad_en_stock)
   FROM producto dp
 );
-
-/* 7. Devuelve el nombre, los apellidos y el email de los empleados que están a
-cargo de Alberto Soria
-*/
++--------------+
+| nombre       |
++--------------+
+| Bonsái Ficus |
++--------------+
+```
+##### 7. Devuelve el nombre, los apellidos y el email de los empleados que están a cargo de Alberto Soria
+```
 SELECT nombre, apellido1, apellido2, email
 FROM empleado
 WHERE codigo_jefe = (
@@ -1176,70 +1232,148 @@ WHERE codigo_jefe = (
     FROM empleado
     WHERE nombre = 'Carlos' AND apellido1 = 'Gómez'
 );
-
-/*8 Devuelve el nombre del cliente con mayor límite de crédito. */ 
++---------+-----------+-----------+-----------------------------+
+| nombre  | apellido1 | apellido2 | email                       |
++---------+-----------+-----------+-----------------------------+
+| Juan    | Pérez     | López     | juan.perez@empresa.com      |
+| Ana     | Gómez     | Martínez  | ana.gomez@empresa.com       |
+| Luis    | Ruiz      | Sánchez   | luis.ruiz@empresa.com       |
+| Elena   | Martínez  | García    | elena.martinez@empresa.com  |
+| María   | López     | Fernández | maria.lopez@empresa.com     |
+| José    | Sánchez   | Rodríguez | jose.sanchez@empresa.com    |
+| Lucía   | Hernández | Jiménez   | lucia.hernandez@empresa.com |
+| Pedro   | García    | Vega      | pedro.garcia@empresa.com    |
+| Laura   | Díaz      | Cruz      | laura.diaz@empresa.com      |
+| Miguel  | Torres    | Navarro   | miguel.torres@empresa.com   |
+| Alberto | Soria     | NULL      | alberto.soria@empresa.com   |
++---------+-----------+-----------+-----------------------------+
+```
+##### 8 Devuelve el nombre del cliente con mayor límite de crédito.
+``` 
 SELECT c.nombre_cliente
 FROM cliente c
 WHERE limite_credito >= ALL (
     SELECT c.limite_credito
     FROM cliente c
 );
---9. Devuelve el nombre del producto que tenga el precio de venta más caro.
++-------------------+
+| nombre_cliente    |
++-------------------+
+| CLIENTE SINLIMITE |
++-------------------+
+```
+##### 9. Devuelve el nombre del producto que tenga el precio de venta más caro.
+```
 SELECT p.nombre
 FROM producto p
 WHERE p.precio_venta >= ALL (
     SELECT precio_venta
     FROM producto
 );
-
---10.  Devuelve el producto que menos unidades tiene en stock.
++--------------+
+| nombre       |
++--------------+
+| Bonsái Ficus |
++--------------+
+```
+##### 10.  Devuelve el producto que menos unidades tiene en stock.
+```
 SELECT p.nombre
 FROM producto p
 WHERE p.cantidad_en_stock <= ALL (
     SELECT p.cantidad_en_stock
     FROM producto p
 );
++--------------+
+| nombre       |
++--------------+
+| Bonsái Ficus |
++--------------+
+```
 
--- 11.. Devuelve el nombre, apellido1 y cargo de los empleados que no
-representen a ningún cliente.
+##### 11. Devuelve el nombre, apellido1 y cargo de los empleados que no representen a ningún cliente. 
+```
 SELECT nombre, apellido1, (SELECT nombre_cargo FROM cargo_empleado WHERE codigo_cargo = empleado.codigo_cargo) AS cargo
 FROM empleado
 WHERE codigo_empleado NOT IN (SELECT codigo_empleado_rep_ventas FROM cliente WHERE codigo_empleado_rep_ventas IS NOT NULL);
-
-/* 12. Devuelve un listado que muestre solamente los clientes que no han
-realizado ningún pago */
++--------+-----------+---------------+
+| nombre | apellido1 | cargo         |
++--------+-----------+---------------+
+| María  | López     | Asistente     |
+| José   | Sánchez   | Desarrollador |
+| Carlos | Gómez     | Gerente       |
+| Lucía  | Hernández | Diseñador     |
+| Laura  | Díaz      | Asistente     |
++--------+-----------+---------------+
+```
+##### 12. Devuelve un listado que muestre solamente los clientes que no han realizado ningún pago 
+```
 SELECT *
 FROM cliente
 WHERE codigo_cliente NOT IN (SELECT codigo_cliente FROM pago);
++----------------+------------------------+-----------------+-------------------+----------+----------------------+------------------+---------------+----------------------------+----------------+
+| codigo_cliente | nombre_cliente         | nombre_contacto | apellido_contacto | fax      | linea_direccion1     | linea_direccion2 | codigo_postal | codigo_empleado_rep_ventas | limite_credito |
++----------------+------------------------+-----------------+-------------------+----------+----------------------+------------------+---------------+----------------------------+----------------+
+|             11 | Cliente MOROSO         | Sara            | Sánchez           | 012-3456 | Calle 10 # 10-10     | Oficina 110      | 28001         |                          2 |       75000.00 |
+|             12 | Cliente de FUENLABRADA | FUEN            | LABRADA           | 666-3456 | Calle yselas # 10-10 | NULL             | 28936         |                          9 |       75000.00 |
+|             14 | CLIENTE SINLIMITE      | Ricky           | Ricon             | 777-7777 | In the heaven 55     | In paradise      | 28936         |                          1 |   999999999.00 |
+|             16 | Cliente DIECI          | Carlos          | Blanco            | 321-4567 | Calle 11 # 11-11     | Oficina 111      | 28001         |                         11 |       50000.00 |
+|             17 | Cliente SEIS           | Maria           | Perez             | 432-5678 | Calle 12 # 12-12     | Oficina 112      | 28001         |                         30 |       75000.00 |
++----------------+------------------------+-----------------+-------------------+----------+----------------------+------------------+---------------+----------------------------+----------------+
+```
 
-
-/* 13 Devuelve un listado que muestre solamente los clientes que sí han realizado
-algún pago */
+##### 13 Devuelve un listado que muestre solamente los clientes que sí han realizado algún pago 
+```
 SELECT *
 FROM cliente
 WHERE codigo_cliente IN (SELECT codigo_cliente FROM pago);
++----------------+----------------+-----------------+-------------------+----------+----------------------+------------------+---------------+----------------------------+----------------+
+| codigo_cliente | nombre_cliente | nombre_contacto | apellido_contacto | fax      | linea_direccion1     | linea_direccion2 | codigo_postal | codigo_empleado_rep_ventas | limite_credito |
++----------------+----------------+-----------------+-------------------+----------+----------------------+------------------+---------------+----------------------------+----------------+
+|              1 | Cliente A      | Carlos          | Rojas             | 123-4567 | Calle 1 # 1-1        | Oficina 101      | 110001        |                          1 |       50000.00 |
+|              2 | Cliente B      | Marta           | López             | 234-5678 | Calle 2 # 2-2        | Oficina 102      | 050001        |                          2 |       75000.00 |
+|              3 | Cliente C      | Luis            | García            | 345-6789 | Calle 3 # 3-3        | Oficina 103      | 760001        |                          3 |       60000.00 |
+|              4 | Cliente D      | Ana             | Pérez             | 456-7890 | Calle 4 # 4-4        | Oficina 104      | 28001         |                          4 |       80000.00 |
+|              5 | Cliente E      | Pedro           | Martínez          | 567-8901 | Calle 5 # 5-5        | Oficina 105      | 08001         |                          1 |       45000.00 |
+|              6 | Cliente F      | Elena           | Gómez             | 678-9012 | Calle 6 # 6-6        | Oficina 106      | 41001         |                          2 |       90000.00 |
+|              7 | Cliente G      | Mario           | Hernández         | 789-0123 | Calle 7 # 7-7        | Oficina 107      | 110001        |                          3 |       55000.00 |
+|              8 | Cliente H      | Lucía           | Ramírez           | 890-1234 | Calle 8 # 8-8        | Oficina 108      | 050001        |                          4 |       70000.00 |
+|              9 | Cliente I      | Jorge           | Fernández         | 901-2345 | Calle 9 # 9-9        | Oficina 109      | 760001        |                          1 |       65000.00 |
+|             10 | Cliente J      | Sara            | Sánchez           | 012-3456 | Calle 10 # 10-10     | Oficina 110      | 28001         |                          2 |       75000.00 |
+|             13 | Cliente que    | paga            | nopide            | 666-3456 | in your mind # 10-10 | NULL             | 28936         |                          9 |      885000.00 |
++----------------+----------------+-----------------+-------------------+----------+----------------------+------------------+---------------+----------------------------+----------------+
+```
 
-
-/*14. Devuelve un listado de los productos que nunca han aparecido en un
-pedido.*/
-
+##### 14. Devuelve un listado de los productos que nunca han aparecido en un pedido.
+```
 SELECT *
 FROM producto
 WHERE codigo_producto NOT IN (SELECT DISTINCT codigo_producto FROM detalle_pedido);
++-----------------+---------------+--------------+--------------+-------------+-------------------+--------------+------------------+------------------+
+| P014            | PRODUCTO FEO  | Ornamentales | 25 cm        | color caca  |               150 |         6.00 |             3.50 |                1 |
++-----------------+---------------+--------------+--------------+-------------+-------------------+--------------+------------------+------------------+
+```
 
-/*15  Devuelve el nombre, apellidos, puesto y teléfono de la oficina de aquellos
-empleados que no sean representante de ventas de ningún cliente.*/
+##### 15  Devuelve el nombre, apellidos, puesto y teléfono de la oficina de aquellos empleados que no sean representante de ventas de ningún cliente.
+```
 SELECT e.nombre, e.apellido1, (SELECT nombre_cargo FROM cargo_empleado WHERE codigo_cargo = e.codigo_cargo) AS cargo, tel_oficina.fijo
 FROM empleado e
 JOIN oficina o ON e.codigo_oficina = o.codigo_oficina
 LEFT JOIN tel_oficina ON e.codigo_oficina = tel_oficina.codigo_oficina
 WHERE e.codigo_empleado NOT IN (SELECT codigo_empleado_rep_ventas FROM cliente WHERE codigo_empleado_rep_ventas IS NOT NULL);
++--------+-----------+---------------+---------+
+| nombre | apellido1 | cargo         | fijo    |
++--------+-----------+---------------+---------+
+| María  | López     | Asistente     | 5678901 |
+| José   | Sánchez   | Desarrollador | 6789012 |
+| Carlos | Gómez     | Gerente       | 1234567 |
+| Lucía  | Hernández | Diseñador     | 2345678 |
+| Laura  | Díaz      | Asistente     | 4567890 |
++--------+-----------+---------------+---------+
+```
 
-
-/*16. Devuelve las oficinas donde no trabajan ninguno de los empleados que
-hayan sido los representantes de ventas de algún cliente que haya realizado
-la compra de algún producto de la gama Frutales*/
-
+##### 16. Devuelve las oficinas donde no trabajan ninguno de los empleados que hayan sido los representantes de ventas de algún cliente que haya realizado la compra de algún producto de la gama Frutales
+```
 SELECT *
 FROM oficina
 WHERE codigo_oficina NOT IN (SELECT DISTINCT codigo_oficina FROM empleado WHERE codigo_empleado IN 
@@ -1248,86 +1382,260 @@ WHERE codigo_oficina NOT IN (SELECT DISTINCT codigo_oficina FROM empleado WHERE 
                                         (SELECT DISTINCT codigo_cliente FROM pedido WHERE codigo_pedido IN 
                                             (SELECT DISTINCT codigo_pedido FROM detalle_pedido WHERE codigo_producto IN 
                                                 (SELECT codigo_producto FROM producto WHERE gama = 'Frutales'))))));
-
-
-/*17.Devuelve un listado con los clientes que han realizado algún pedido pero no
-han realizado ningún pago.*/
-
++----------------+---------------+------------------------------+----------------------+
+| codigo_oficina | codigo_postal | linea_direccion1             | linea_direccion2     |
++----------------+---------------+------------------------------+----------------------+
+| OF002          | 050001        | Calle 10 # 20-30             | Oficina 201          |
+| OF003          | 760001        | Avenida 3 # 45-67            | Centro Comercial XYZ |
+| OF004          | 01000         | Paseo de la Reforma 123      | Piso 10              |
+| OF005          | 44100         | Calle Independencia 456      | Edificio DEF         |
+| OF006          | 64000         | Avenida Constitución 789     | Suite 100            |
+| OF007          | 28001         | Calle Mayor 1                | Oficina 5            |
+| OF008          | 08001         | Passeig de Gràcia 2          | Piso 3               |
+| OF009          | 41001         | Avenida de la Constitución 3 | Local B              |
+| OF010          | 90001         | Main Street 100              | Building 50          |
+| OF011          | 77001         | Broadway 200                 | Suite 300            |
+| OF012          | 33001         | Ocean Drive 300              | Apartment 400        |
++----------------+---------------+------------------------------+----------------------+
+```
+##### 17.Devuelve un listado con los clientes que han realizado algún pedido pero no han realizado ningún pago.
+```
 SELECT *
 FROM cliente
 WHERE codigo_cliente IN (SELECT codigo_cliente FROM pedido) AND codigo_cliente NOT IN (SELECT codigo_cliente FROM pago);
 
-/*18.Devuelve un listado que muestre solamente los clientes que no han
-realizado ningún pago */
++----------------+----------------+-----------------+-------------------+----------+------------------+------------------+---------------+----------------------------+----------------+
+| codigo_cliente | nombre_cliente | nombre_contacto | apellido_contacto | fax      | linea_direccion1 | linea_direccion2 | codigo_postal | codigo_empleado_rep_ventas | limite_credito |
++----------------+----------------+-----------------+-------------------+----------+------------------+------------------+---------------+----------------------------+----------------+
+|             11 | Cliente MOROSO | Sara            | Sánchez           | 012-3456 | Calle 10 # 10-10 | Oficina 110      | 28001         |                          2 |       75000.00 |
++----------------+----------------+-----------------+-------------------+----------+------------------+------------------+---------------+----------------------------+----------------+
+```
+##### 18.Devuelve un listado que muestre solamente los clientes que no han realizado ningún pago 
+```
 SELECT *
 FROM cliente c
 WHERE NOT EXISTS (SELECT * FROM pago WHERE codigo_cliente = c.codigo_cliente);
-/*19 Devuelve un listado que muestre solamente los clientes que sí han realizado
-algún pago*/
++----------------+------------------------+-----------------+-------------------+----------+----------------------+------------------+---------------+----------------------------+----------------+
+| codigo_cliente | nombre_cliente         | nombre_contacto | apellido_contacto | fax      | linea_direccion1     | linea_direccion2 | codigo_postal | codigo_empleado_rep_ventas | limite_credito |
++----------------+------------------------+-----------------+-------------------+----------+----------------------+------------------+---------------+----------------------------+----------------+
+|             11 | Cliente MOROSO         | Sara            | Sánchez           | 012-3456 | Calle 10 # 10-10     | Oficina 110      | 28001         |                          2 |       75000.00 |
+|             12 | Cliente de FUENLABRADA | FUEN            | LABRADA           | 666-3456 | Calle yselas # 10-10 | NULL             | 28936         |                          9 |       75000.00 |
+|             14 | CLIENTE SINLIMITE      | Ricky           | Ricon             | 777-7777 | In the heaven 55     | In paradise      | 28936         |                          1 |   999999999.00 |
+|             16 | Cliente DIECI          | Carlos          | Blanco            | 321-4567 | Calle 11 # 11-11     | Oficina 111      | 28001         |                         11 |       50000.00 |
+|             17 | Cliente SEIS           | Maria           | Perez             | 432-5678 | Calle 12 # 12-12     | Oficina 112      | 28001         |                         30 |       75000.00 |
++----------------+------------------------+-----------------+-------------------+----------+----------------------+------------------+---------------+----------------------------+----------------+
+```
+##### 19 Devuelve un listado que muestre solamente los clientes que sí han realizado algún pago*/
+```
 SELECT *
 FROM cliente c
 WHERE EXISTS (SELECT * FROM pago WHERE codigo_cliente = c.codigo_cliente);
 
-/* 20 Devuelve un listado de los productos que nunca han aparecido en un */
-
++----------------+----------------+-----------------+-------------------+----------+----------------------+------------------+---------------+----------------------------+----------------+
+| codigo_cliente | nombre_cliente | nombre_contacto | apellido_contacto | fax      | linea_direccion1     | linea_direccion2 | codigo_postal | codigo_empleado_rep_ventas | limite_credito |
++----------------+----------------+-----------------+-------------------+----------+----------------------+------------------+---------------+----------------------------+----------------+
+|              1 | Cliente A      | Carlos          | Rojas             | 123-4567 | Calle 1 # 1-1        | Oficina 101      | 110001        |                          1 |       50000.00 |
+|              2 | Cliente B      | Marta           | López             | 234-5678 | Calle 2 # 2-2        | Oficina 102      | 050001        |                          2 |       75000.00 |
+|              3 | Cliente C      | Luis            | García            | 345-6789 | Calle 3 # 3-3        | Oficina 103      | 760001        |                          3 |       60000.00 |
+|              4 | Cliente D      | Ana             | Pérez             | 456-7890 | Calle 4 # 4-4        | Oficina 104      | 28001         |                          4 |       80000.00 |
+|              5 | Cliente E      | Pedro           | Martínez          | 567-8901 | Calle 5 # 5-5        | Oficina 105      | 08001         |                          1 |       45000.00 |
+|              6 | Cliente F      | Elena           | Gómez             | 678-9012 | Calle 6 # 6-6        | Oficina 106      | 41001         |                          2 |       90000.00 |
+|              7 | Cliente G      | Mario           | Hernández         | 789-0123 | Calle 7 # 7-7        | Oficina 107      | 110001        |                          3 |       55000.00 |
+|              8 | Cliente H      | Lucía           | Ramírez           | 890-1234 | Calle 8 # 8-8        | Oficina 108      | 050001        |                          4 |       70000.00 |
+|              9 | Cliente I      | Jorge           | Fernández         | 901-2345 | Calle 9 # 9-9        | Oficina 109      | 760001        |                          1 |       65000.00 |
+|             10 | Cliente J      | Sara            | Sánchez           | 012-3456 | Calle 10 # 10-10     | Oficina 110      | 28001         |                          2 |       75000.00 |
+|             13 | Cliente que    | paga            | nopide            | 666-3456 | in your mind # 10-10 | NULL             | 28936         |                          9 |      885000.00 |
++----------------+----------------+-----------------+-------------------+----------+----------------------+------------------+---------------+----------------------------+----------------+
+```
+##### 20 Devuelve un listado de los productos que nunca han aparecido en un pedido
+```
 SELECT *
 FROM producto p
 WHERE NOT EXISTS (SELECT * FROM detalle_pedido WHERE codigo_producto = p.codigo_producto);
-
--- 21 Devuelve un listado de los productos que han aparecido en un pedido alguna vez.
-
++-----------------+---------------+--------------+--------------+-------------+-------------------+--------------+------------------+------------------+
+| codigo_producto | nombre        | gama         | dimiensiones | descripcion | cantidad_en_stock | precio_venta | precio_proveedor | codigo_proovedor |
++-----------------+---------------+--------------+--------------+-------------+-------------------+--------------+------------------+------------------+
+| P014            | PRODUCTO FEO  | Ornamentales | 25 cm        | color caca  |               150 |         6.00 |             3.50 |                1 |
++-----------------+---------------+--------------+--------------+-------------+-------------------+--------------+------------------+------------------+
+```
+##### 21 Devuelve un listado de los productos que han aparecido en un pedido alguna vez.
+```
 SELECT DISTINCT codigo_producto
 FROM detalle_pedido;
-
--- /////////////  Subconsultas correlacionadas \\\\\\\\\\\\\\\
--- 1. Devuelve el listado de clientes indicando el nombre del cliente y cuántos pedidos ha realizado. Tenga en cuenta que pueden existir clientes que no han realizado ningún pedido.
++-----------------+
+| codigo_producto |
++-----------------+
+| OR001           |
+| P001            |
+| P002            |
+| P003            |
+| P004            |
+| P005            |
+| P006            |
+| P007            |
+| P008            |
+| P009            |
+| P010            |
+| P011            |
+| P012            |
+| P013            |
++-----------------+
+```
+#### /////////////  Subconsultas correlacionadas \\\\\\\\\\\\\\\
+##### 1. Devuelve el listado de clientes indicando el nombre del cliente y cuántos pedidos ha realizado. Tenga en cuenta que pueden existir clientes que no han realizado ningún pedido.
+```
 
 SELECT c.nombre_cliente, COUNT(p.codigo_pedido) AS pedidos_realizados
 FROM cliente c
 LEFT JOIN pedido p ON c.codigo_cliente = p.codigo_cliente
 GROUP BY c.codigo_cliente;
--- 2. Devuelve un listado con los nombres de los clientes y el total pagado por cada uno de ellos. Tenga en cuenta que pueden existir clientes que no han realizado ningún pago.
++------------------------+--------------------+
+| nombre_cliente         | pedidos_realizados |
++------------------------+--------------------+
+| Cliente A              |                  2 |
+| Cliente B              |                  1 |
+| Cliente C              |                  1 |
+| Cliente D              |                  1 |
+| Cliente E              |                  2 |
+| Cliente F              |                  1 |
+| Cliente G              |                  1 |
+| Cliente H              |                  1 |
+| Cliente I              |                  1 |
+| Cliente J              |                  2 |
+| Cliente MOROSO         |                  1 |
+| Cliente de FUENLABRADA |                  0 |
+| Cliente que            |                  0 |
+| CLIENTE SINLIMITE      |                  0 |
+| Cliente DIECI          |                  0 |
+| Cliente SEIS           |                  0 |
++------------------------+--------------------+
+```
 
+##### 2. Devuelve un listado con los nombres de los clientes y el total pagado por cada uno de ellos. Tenga en cuenta que pueden existir clientes que no han realizado ningún pago.
+```
 SELECT c.nombre_cliente, COALESCE(SUM(pa.total), 0) AS total_pagado
 FROM cliente c
 LEFT JOIN pago pa ON c.codigo_cliente = pa.codigo_cliente
 GROUP BY c.codigo_cliente;
-
---3.Devuelve el nombre de los clientes que hayan hecho pedidos en 2008 ordenados alfabéticamente de menor a mayor.
++------------------------+--------------+
+| nombre_cliente         | total_pagado |
++------------------------+--------------+
+| Cliente A              |      6500.00 |
+| Cliente B              |      2500.00 |
+| Cliente C              |      1750.00 |
+| Cliente D              |      1250.00 |
+| Cliente E              |      3000.00 |
+| Cliente F              |      2200.00 |
+| Cliente G              |      1850.00 |
+| Cliente H              |      2750.00 |
+| Cliente I              |      3200.00 |
+| Cliente J              |      4100.00 |
+| Cliente MOROSO         |         0.00 |
+| Cliente de FUENLABRADA |         0.00 |
+| Cliente que            |         0.00 |
+| CLIENTE SINLIMITE      |         0.00 |
+| Cliente DIECI          |         0.00 |
+| Cliente SEIS           |         0.00 |
++------------------------+--------------+
+```
+##### 3.Devuelve el nombre de los clientes que hayan hecho pedidos en 2008 ordenados alfabéticamente de menor a mayor.
+```
 SELECT DISTINCT c.nombre_cliente
 FROM cliente c
 JOIN pedido p ON c.codigo_cliente = p.codigo_cliente
 WHERE YEAR(p.fecha_pedido) = 2008
 ORDER BY c.nombre_cliente ASC;
 
-/* 4. Devuelve el nombre del cliente, el nombre y primer apellido de su representante de ventas y el número de teléfono de la 
-oficina del representante de ventas, de aquellos clientes que no hayan realizado ningún pago.*/
++----------------+
+| nombre_cliente |
++----------------+
+| Cliente A      |
+| Cliente C      |
+| Cliente D      |
+| Cliente H      |
++----------------+-----------+
+```
+##### 4. Devuelve el nombre del cliente, el nombre y primer apellido de su representante de ventas y el número de teléfono de la  oficina del representante de ventas, de aquellos clientes que no hayan realizado ningún pago.
+```
 SELECT c.nombre_cliente, e.nombre, e.apellido1, tof.fijo AS telefono_oficina
 FROM cliente c
 JOIN empleado e ON c.codigo_empleado_rep_ventas = e.codigo_empleado
 JOIN oficina o ON e.codigo_oficina = o.codigo_oficina
 LEFT JOIN tel_oficina tof ON e.codigo_oficina = tof.codigo_oficina
 WHERE c.codigo_cliente NOT IN (SELECT codigo_cliente FROM pago);
---5. Devuelve el listado de clientes donde aparezca el nombre del cliente, el nombre y primer apellido de su representante de ventas y la ciudad donde está su oficina.
-
++------------------------+---------+-----------+------------------+
+| nombre_cliente         | nombre  | apellido1 | telefono_oficina |
++------------------------+---------+-----------+------------------+
+| Cliente MOROSO         | Ana     | Gómez     | 2345678          |
+| Cliente de FUENLABRADA | Pedro   | García    | 3456789          |
+| CLIENTE SINLIMITE      | Juan    | Pérez     | 1234567          |
+| Cliente DIECI          | Miguel  | Torres    | 4567890          |
+| Cliente SEIS           | Alberto | Soria     | 4567890          |
++------------------------+---------+-----------+------------------+
+```
+##### 5. Devuelve el listado de clientes donde aparezca el nombre del cliente, el nombre y primer apellido de su representante de ventas y la ciudad donde está su oficina.
+```
 SELECT c.nombre_cliente, e.nombre, e.apellido1, ci.nombre_ciudad AS ciudad_oficina
 FROM cliente c
 JOIN empleado e ON c.codigo_empleado_rep_ventas = e.codigo_empleado
 JOIN oficina o ON e.codigo_oficina = o.codigo_oficina
-JOIN ciudad ci ON o.codigo_postal = ci.codigo_ciudad;
-
---6. Devuelve el nombre, apellidos, puesto y teléfono de la oficina de aquellos empleados que no sean representantes de ventas de ningún cliente.
-
+JOIN codigo_postal cp ON cp.cod_postal = o.codigo_postal
+JOIN ciudad ci ON cp.codigo_ciudad = ci.codigo_ciudad;
++------------------------+---------+-----------+----------------+
+| nombre_cliente         | nombre  | apellido1 | ciudad_oficina |
++------------------------+---------+-----------+----------------+
+| Cliente A              | Juan    | Pérez     | Bogotá         |
+| Cliente E              | Juan    | Pérez     | Bogotá         |
+| Cliente I              | Juan    | Pérez     | Bogotá         |
+| CLIENTE SINLIMITE      | Juan    | Pérez     | Bogotá         |
+| Cliente B              | Ana     | Gómez     | Medellín       |
+| Cliente F              | Ana     | Gómez     | Medellín       |
+| Cliente J              | Ana     | Gómez     | Medellín       |
+| Cliente MOROSO         | Ana     | Gómez     | Medellín       |
+| Cliente C              | Luis    | Ruiz      | Cali           |
+| Cliente G              | Luis    | Ruiz      | Cali           |
+| Cliente D              | Elena   | Martínez  | Madrid         |
+| Cliente H              | Elena   | Martínez  | Madrid         |
+| Cliente de FUENLABRADA | Pedro   | García    | Cali           |
+| Cliente que            | Pedro   | García    | Cali           |
+| Cliente DIECI          | Miguel  | Torres    | Madrid         |
+| Cliente SEIS           | Alberto | Soria     | Madrid         |
++------------------------+---------+-----------+----------------+
+```
+##### 6. Devuelve el nombre, apellidos, puesto y teléfono de la oficina de aquellos empleados que no sean representantes de ventas de ningún cliente.
+```
 SELECT e.nombre, e.apellido1, ce.nombre_cargo AS puesto, tof.fijo AS telefono_oficina
 FROM empleado e
 JOIN cargo_empleado ce ON e.codigo_cargo = ce.codigo_cargo
 JOIN oficina o ON e.codigo_oficina = o.codigo_oficina
 JOIN tel_oficina tof ON e.codigo_oficina = tof.codigo_oficina
 WHERE e.codigo_empleado NOT IN (SELECT codigo_empleado_rep_ventas FROM cliente WHERE codigo_empleado_rep_ventas IS NOT NULL);
-
--- 7. Devuelve un listado indicando todas las ciudades donde hay oficinas y el número de empleados que tiene.
++--------+-----------+---------------+------------------+
+| nombre | apellido1 | puesto        | telefono_oficina |
++--------+-----------+---------------+------------------+
+| Carlos | Gómez     | Gerente       | 1234567          |
+| Lucía  | Hernández | Diseñador     | 2345678          |
+| Laura  | Díaz      | Asistente     | 4567890          |
+| María  | López     | Asistente     | 5678901          |
+| José   | Sánchez   | Desarrollador | 6789012          |
++--------+-----------+---------------+------------------+
+```
+##### 7. Devuelve un listado indicando todas las ciudades donde hay oficinas y el número de empleados que tiene.
+```
 SELECT ci.nombre_ciudad AS ciudad_oficina, COUNT(e.codigo_empleado) AS numero_empleados
 FROM empleado e
 JOIN oficina o ON e.codigo_oficina = o.codigo_oficina
-JOIN ciudad ci ON o.codigo_postal = ci.codigo_ciudad
+JOIN codigo_postal cp ON cp.cod_postal = o.codigo_postal
+JOIN ciudad ci ON cp.codigo_ciudad = ci.codigo_ciudad
 GROUP BY ci.nombre_ciudad;
++----------------+------------------+
+| ciudad_oficina | numero_empleados |
++----------------+------------------+
+| Bogotá         |                2 |
+| Medellín       |                2 |
+| Cali           |                2 |
+| Madrid         |                4 |
+| Barcelona      |                1 |
+| Sevilla        |                1 |
++----------------+------------------+
+```

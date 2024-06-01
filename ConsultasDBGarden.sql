@@ -1,4 +1,4 @@
--- Active: 1717105247149@@127.0.0.1@3306@dbGarden
+-- Active: 1717012450849@@127.0.0.1@3306@dbgarden
 use dbgarden;
 
 --1. Devuelve un listado con el código de oficina y la ciudad donde hay oficinas.
@@ -759,7 +759,8 @@ SELECT c.nombre_cliente, e.nombre, e.apellido1, ci.nombre_ciudad AS ciudad_ofici
 FROM cliente c
 JOIN empleado e ON c.codigo_empleado_rep_ventas = e.codigo_empleado
 JOIN oficina o ON e.codigo_oficina = o.codigo_oficina
-JOIN ciudad ci ON o.codigo_postal = ci.codigo_ciudad;
+JOIN codigo_postal cp ON cp.cod_postal = o.codigo_postal
+JOIN ciudad ci ON cp.codigo_ciudad = ci.codigo_ciudad;
 
 --6. Devuelve el nombre, apellidos, puesto y teléfono de la oficina de aquellos empleados que no sean representantes de ventas de ningún cliente.
 
@@ -774,5 +775,8 @@ WHERE e.codigo_empleado NOT IN (SELECT codigo_empleado_rep_ventas FROM cliente W
 SELECT ci.nombre_ciudad AS ciudad_oficina, COUNT(e.codigo_empleado) AS numero_empleados
 FROM empleado e
 JOIN oficina o ON e.codigo_oficina = o.codigo_oficina
-JOIN ciudad ci ON o.codigo_postal = ci.codigo_ciudad
+JOIN codigo_postal cp ON cp.cod_postal = o.codigo_postal
+JOIN ciudad ci ON cp.codigo_ciudad = ci.codigo_ciudad
 GROUP BY ci.nombre_ciudad;
+
+
